@@ -28,7 +28,7 @@ report.process(UserModel.first)
 # You can also `process` on a collection
 # report.process(User.all.limit(50))
 
-report.to_csv
+report.as_csv
 ```
 
 The example above is basic - you have a User model and you want to export the two fields `id` and `is_admin`.

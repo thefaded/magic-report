@@ -20,5 +20,6 @@ module MagicReport
   require "magic_report/report/configuration"
   require "magic_report/report/process"
   require "magic_report/report/row"
+  require "magic_report/report/csv"
   require "magic_report/report"
 end

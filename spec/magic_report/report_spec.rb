@@ -118,6 +118,10 @@ RSpec.describe MagicReport::Report do
         ]
       )
       expect(subject.result.flat_map(&:to_h)).to eq(another_subject.result.flat_map(&:to_h))
+
+      io = subject.as_csv.csv.to_io
+      io.rewind
+      expect(io.read).to eq("ID,Name,Full name,Car Name\n5,Dan,DanMagic,BMW\n5,Dan,DanMagic,Lexus\n")
     end
   end
 end

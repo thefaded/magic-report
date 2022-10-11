@@ -21,7 +21,12 @@ module MagicReport
     end
 
     def as_csv
-      ::MagicReport::Report::Csv.new(self).generate
+      @as_csv ||= begin
+        csv = ::MagicReport::Report::Csv.new(self)
+        csv.generate
+
+        csv
+      end
     end
 
     def headings
