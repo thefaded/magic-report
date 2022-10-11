@@ -1,36 +1,55 @@
 # MagicReport
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/MagicReport`. To experiment with that code, run `bin/console` for an interactive prompt.
+An easy way to export data to CSV
 
-TODO: Delete this and the text above, and describe your gem
+[![Build Status](https://github.com/thefaded/magic-report/workflows/test/badge.svg?branch=master)](https://github.com/thefaded/magic-report/actions)
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add this line to your application’s Gemfile:
 
 ```ruby
-gem 'MagicReport'
+gem "magic-operation"
 ```
 
-And then execute:
+## Getting Started
 
-    $ bundle install
+This gem provides an ActiveRecord-like DSL to create CSV reports. One of the common use cases is when you have nested data.
 
-Or install it yourself as:
+```ruby
+class User < MagicReport::Report
+  field :id
+  field :is_admin, ->(user) { user.is_admin ? "Yes" : "No" }
+end
+```
 
-    $ gem install MagicReport
+The example above is basic - you have a User model and you want to export the two fields `id` and `is_admin`.
+The users of your application may not particularly like the naming `true` or `false` since these are more technical terms, that's why you can pass an additional block to the field.
 
-## Usage
+Also, for each report you must provide locales file:
 
-TODO: Write usage instructions here
+```yaml
+en:
+  magic_report:
+    headings:
+      user:
+        id: ID
+        is_admin: Admin?
+```
 
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+CSV will be
+| ID | Admin? |
+| ---- | -------- |
+| 123 | Yes |
+| 222 | No |
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/MagicReport.
+Everyone is encouraged to help improve this project. Here are a few ways you can help:
 
+- [Report bugs](https://github.com/thefaded/magic-report/issues)
+- Fix bugs and [submit pull requests](https://github.com/thefaded/magic-report/pulls)
+- Write, clarify, or fix documentation
+- Suggest or add new features
+
+To get started with development and testing, check out the [Contributing Guide](CONTRIBUTING.md).
