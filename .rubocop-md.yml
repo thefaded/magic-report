@@ -1,0 +1,16 @@
+inherit_from: ".rubocop.yml"
+
+require:
+  - rubocop-md
+
+AllCops:
+  Include:
+    - "**/*.md"
+
+Naming/FileName:
+  Exclude:
+    - "**/*.md"
+
+Layout/InitialIndentation:
+  Exclude:
+    - "CHANGELOG.md"
