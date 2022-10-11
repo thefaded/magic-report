@@ -43,6 +43,52 @@ CSV will be
 | 123 | Yes |
 | 222 | No |
 
+## Nested
+
+Let's look at a more complex example. Now we have a user model with an address and several cars.
+
+```ruby
+class User < MagicReport::Report
+  field :id
+  field :is_admin, ->(user) { user.is_admin ? "Yes" : "No" }
+
+  has_one :address, class: Address
+  has_many :cars, class: Car
+end
+
+class Address < MagicReport::Report
+  fields :address_line_1, :city
+end
+
+class Car < MagicReport::Report
+  field :name
+end
+```
+
+Because we have explicitly said that the user `has_many :cars`, the number of lines in the CSV will be equal to the number of cars.
+
+```yaml
+en:
+  magic_report:
+    headings:
+      user:
+        id: ID
+        is_admin: Admin?
+        address: User address
+        cars: Car
+      car:
+        name: Name
+      address:
+        address_line_1: Line 1
+        city: City
+```
+
+CSV will be
+| ID | Admin? | Address Line 1 | Address City | Car Name |
+| ---- | -------- | -------------- | ------------ | -------- |
+| 123 | Yes | 5th Ave | NY | Lexus |
+| 123 | Yes | 5th Ave | NY | BMW |
+
 ## Contributing
 
 Everyone is encouraged to help improve this project. Here are a few ways you can help:
