@@ -32,7 +32,7 @@ module MagicReport
     def as_attachment
       {
         mime_type: "text/csv",
-        content: as_csv.io
+        content: as_csv.io.read
       }
     end
 
