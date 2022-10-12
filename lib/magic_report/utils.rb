@@ -25,7 +25,7 @@ module MagicReport
     # @param name is the report name
     # @key is a field
     def t(name:, key:)
-      I18n.translate!("magic_report.headings.#{name}.#{key}")
+      I18n.translate!("magic_report.#{name}.#{key}")
     end
 
     module_function :underscore

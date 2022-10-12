@@ -19,12 +19,18 @@ module MagicReport
         report.result.each do |row|
           row.to_h.each { |nested_row| csv << nested_row.values }
         end
-        # ensure
-        # file.close
       end
 
+      # Don't forget to unlink in production code
       def unlink
+        file.close
         file.unlink
+      end
+
+      def io
+        io = csv.to_io
+        io.rewind
+        io
       end
 
       private

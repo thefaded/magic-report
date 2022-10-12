@@ -4,7 +4,7 @@ module MagicReport
   class Report
     module ClassHelpers
       def name_from_class
-        ::MagicReport::Utils.underscore(self.class.name)
+        ::MagicReport::Utils.underscore(self.class.name).tr("/", ".")
       end
 
       def fields_from_class

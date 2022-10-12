@@ -9,7 +9,7 @@ An easy way to export data to CSV
 Add this line to your application’s Gemfile:
 
 ```ruby
-gem "magic-operation"
+gem "magic-report", require: "magic_report"
 ```
 
 ## Getting Started
@@ -39,10 +39,9 @@ Also, for each report you must provide locales file:
 ```yaml
 en:
   magic_report:
-    headings:
-      user:
-        id: ID
-        is_admin: Admin?
+    user:
+      id: ID
+      is_admin: Admin?
 ```
 
 CSV will be
@@ -80,19 +79,18 @@ Because we have explicitly said that the user `has_many :cars`, the number of li
 ```yaml
 en:
   magic_report:
-    headings:
-      user:
-        id: ID
-        is_admin: Admin?
-        address: User address
-        cars: Car
-        shipping_address: Shipping address
-        billing_address: Billing address
-      car:
-        name: Name
-      address:
-        address_line_1: Line 1
-        city: City
+    user:
+      id: ID
+      is_admin: Admin?
+      address: User address
+      cars: Car
+      shipping_address: Shipping address
+      billing_address: Billing address
+    car:
+      name: Name
+    address:
+      address_line_1: Line 1
+      city: City
 ```
 
 CSV will be

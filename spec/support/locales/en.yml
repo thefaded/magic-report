@@ -1,13 +1,12 @@
 en:
   magic_report:
-    headings:
-      car:
-        name: Name
-      user:
-        id: ID
-        name: Name
-        full_name: Full name
-        car: Car
-      address:
-        address_line_1: Address line 1
-        city: City
+    car:
+      name: Name
+    user:
+      id: ID
+      name: Name
+      full_name: Full name
+      car: Car
+    address:
+      address_line_1: Address line 1
+      city: City

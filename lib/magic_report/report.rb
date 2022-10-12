@@ -29,6 +29,13 @@ module MagicReport
       end
     end
 
+    def as_attachment
+      {
+        mime_type: "text/csv",
+        content: as_csv.io
+      }
+    end
+
     def headings
       @headings ||= (fields.map { |field| t(field.key) } + has_one.map { |association| association.report.headings } + has_many.map { |association| association.report.headings }).flatten
     end
