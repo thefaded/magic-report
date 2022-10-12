@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    magic-report (0.4.0)
+    magic-report (0.5.0)
       dry-types
 
 GEM
