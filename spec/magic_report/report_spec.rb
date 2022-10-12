@@ -34,6 +34,7 @@ RSpec.describe MagicReport::Report do
       row = subject.process(user)
 
       expect(row.to_h).to eq(id: 5, name: "Dan", full_name: "DanMagic")
+      expect(subject.as_csv.io.read).to eq("ID,Name,Full name\n5,Dan,DanMagic\n")
     end
   end
 

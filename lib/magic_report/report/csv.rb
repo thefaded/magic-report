@@ -16,8 +16,14 @@ module MagicReport
       def generate
         write_headers
 
-        report.result.each do |row|
-          row.to_h.each { |nested_row| csv << nested_row.values }
+        [report.result].flatten.each do |row|
+          value = row.to_h
+
+          if value.is_a?(Array)
+            value.each { |nested_row| csv << nested_row.values }
+          else
+            csv << value.values
+          end
         end
       end
 
