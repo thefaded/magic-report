@@ -2,6 +2,7 @@ en:
   magic_report:
     car:
       name: Name
+      car: Inner car
     user:
       id: ID
       name: Name
@@ -10,3 +11,5 @@ en:
     address:
       address_line_1: Address line 1
       city: City
+    car_price:
+      amount: Amount

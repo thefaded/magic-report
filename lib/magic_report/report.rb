@@ -67,8 +67,10 @@ module MagicReport
 
         klass = ::MagicReport::Utils.derive_class(opts, &block)
 
+        opts[:name] = ::MagicReport::Utils.underscore(opts[:name].to_s) if opts[:name]
+
         if (prefix = opts[:prefix])
-          opts[:prefix] = new.instance_exec(&prefix)
+          opts[:prefix] = new(name: ::MagicReport::Utils.underscore(name.to_s)).instance_exec(&prefix)
         end
 
         @has_one << Configuration::HasOne.new(klass: klass, opts: opts, key: coerced_attribute)
@@ -81,8 +83,10 @@ module MagicReport
 
         klass = ::MagicReport::Utils.derive_class(opts, &block)
 
+        opts[:name] = ::MagicReport::Utils.underscore(opts[:name].to_s) if opts[:name]
+
         if (prefix = opts[:prefix])
-          opts[:prefix] = new.instance_exec(&prefix)
+          opts[:prefix] = new(name: ::MagicReport::Utils.underscore(name.to_s)).instance_exec(&prefix)
         end
 
         @has_many << Configuration::HasMany.new(klass: klass, opts: opts, key: coerced_attribute)

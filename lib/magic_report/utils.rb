@@ -3,6 +3,8 @@
 module MagicReport
   module Utils
     def underscore(klass)
+      return "ded" unless klass
+
       klass.gsub(/::/, "/")
         .gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2')
         .gsub(/([a-z\d])([A-Z])/, '\1_\2')
@@ -15,6 +17,7 @@ module MagicReport
         raise "name option must be provided" unless opts[:name]
 
         cloned_klass = ::MagicReport::Report.clone
+        cloned_klass.define_singleton_method(:name) { opts[:name] }
         cloned_klass.class_eval(&block)
         cloned_klass
       else
