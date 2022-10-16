@@ -63,7 +63,7 @@ module MagicReport
       end
 
       def i18n_key
-        name.underscore.to_sym
+        name.underscore.tr("/", ".").to_sym
       end
 
       def field(name, processor = nil)
