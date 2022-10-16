@@ -3,6 +3,10 @@
 require "dry-types"
 require "i18n"
 
+require "active_support"
+require "active_support/core_ext/class/attribute"
+require "active_support/inflector"
+
 require "magic_report/version"
 
 module MagicReport
@@ -14,12 +18,11 @@ module MagicReport
     SymbolArray = Array.of(Types::Coercible::Symbol)
   end
 
-  require "magic_report/utils"
+  require "magic_report/report/builder/field"
+  require "magic_report/report/builder/has_one"
+  require "magic_report/report/builder/has_many"
 
-  require "magic_report/report/class_helpers"
-  require "magic_report/report/configuration"
-  require "magic_report/report/process"
+  require "magic_report/report/reflection"
   require "magic_report/report/row"
-  require "magic_report/report/csv"
   require "magic_report/report"
 end

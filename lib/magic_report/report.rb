@@ -2,107 +2,111 @@
 
 module MagicReport
   class Report
-    include ClassHelpers
+    include Reflection
 
-    attr_reader :fields, :has_one, :has_many, :name, :nested_field, :prefix, :result
+    attr_reader :model, :row
 
-    def initialize(fields: nil, has_one: nil, has_many: nil, name: nil, prefix: nil, nested_field: nil)
-      @fields = fields || fields_from_class
-      @has_one = has_one || has_one_from_class
-      @has_many = has_many || has_many_from_class
-      @name = name || name_from_class
-
-      @prefix = prefix
-      @nested_field = nested_field
+    def initialize(model, row = nil)
+      @model = model
+      @row = row || self.class.build_row
     end
 
-    def process(input)
-      @result = ::MagicReport::Report::Process.new(self).call(input)
-    end
+    def rows
+      @rows ||= begin
+        rows = []
 
-    def as_csv
-      @as_csv ||= begin
-        csv = ::MagicReport::Report::Csv.new(self)
-        csv.generate
+        _fields.each_value do |field|
+          row.add_column_value(key: field.name, value: field.process(model))
+        end
 
-        csv
+        _has_one.each_value do |has_one|
+          simple_row = row.nested_rows[has_one.name]
+
+          has_one.process_rows(model, simple_row)
+        end
+
+        rows.push(row)
+
+        _has_many.each_value do |has_many|
+          simple_row = row.nested_rows[has_many.name]
+
+          resik = has_many.process_rows(model, simple_row)
+
+          resik.shift.map do |resik_row|
+            new_row = self.class.build_row
+
+            # TODO: copy ID here
+            # copy_primary_attributes(new_row, row)
+
+            new_row.nested_rows[has_many.name] = resik_row
+
+            rows.push(new_row)
+          end
+        end
+
+        rows
       end
-    end
-
-    def as_attachment
-      {
-        mime_type: "text/csv",
-        content: as_csv.io.read
-      }
     end
 
     def headings
-      @headings ||= (fields.map { |field| t(field.key) } + has_one.map { |association| association.report.headings } + has_many.map { |association| association.report.headings }).flatten
+      row.headings
     end
 
     class << self
-      def t(key)
-        ::MagicReport::Utils.t(name: name, key: key)
+      # Default i18n scope for locales
+      #
+      # en:
+      #   magic_report:
+      #
+      def i18n_scope
+        :magic_report
       end
 
-      def fields(*attrs)
-        @fields ||= []
-
-        Types::SymbolArray[attrs].each do |key|
-          @fields << Configuration::Field.new(key: key)
-        end
+      def i18n_key
+        name.underscore.to_sym
       end
 
-      def field(*attrs)
-        key, processor = attrs
+      def field(name, processor = nil)
+        reflection = Builder::Field.build(self, name, processor)
 
-        @fields ||= []
-        @fields << Configuration::Field.new(key: key, processor: processor)
+        Reflection.add_field(self, name, reflection)
       end
 
-      def has_one(attribute, opts = {}, &block)
-        @has_one ||= []
-
-        coerced_attribute = Types::Coercible::Symbol[attribute]
-
-        klass = ::MagicReport::Utils.derive_class(opts, &block)
-
-        opts[:name] = ::MagicReport::Utils.underscore(opts[:name].to_s) if opts[:name]
-
-        if (prefix = opts[:prefix])
-          opts[:prefix] = new(name: ::MagicReport::Utils.underscore(name.to_s)).instance_exec(&prefix)
-        end
-
-        @has_one << Configuration::HasOne.new(klass: klass, opts: opts, key: coerced_attribute)
+      def fields(*names)
+        names.each { |name| field(name) }
       end
 
-      def has_many(attribute, opts = {}, &block)
-        @has_many ||= []
+      def has_one(name, **options, &extension)
+        reflection = Builder::HasOne.build(self, name, options, &extension)
 
-        coerced_attribute = Types::Coercible::Symbol[attribute]
+        Reflection.add_has_one(self, name, reflection)
+      end
 
-        klass = ::MagicReport::Utils.derive_class(opts, &block)
+      def has_many(name, **options, &extension)
+        reflection = Builder::HasMany.build(self, name, options, &extension)
 
-        opts[:name] = ::MagicReport::Utils.underscore(opts[:name].to_s) if opts[:name]
+        Reflection.add_has_many(self, name, reflection)
+      end
 
-        if (prefix = opts[:prefix])
-          opts[:prefix] = new(name: ::MagicReport::Utils.underscore(name.to_s)).instance_exec(&prefix)
+      # Building empty row for current report
+      # This row doesn't include outer reports
+      def build_row(prefix = nil)
+        row = ::MagicReport::Report::Row.new
+
+        _fields.each_value do |field|
+          row.register_column(field.name, I18n.t!("#{i18n_scope}.#{i18n_key}.#{field.name}".tr("/", ".")), prefix)
         end
 
-        @has_many << Configuration::HasMany.new(klass: klass, opts: opts, key: coerced_attribute)
+        _has_one.each_value do |has_one|
+          row.add_nested_row(key: has_one.name, row: has_one.build_row)
+        end
+
+        _has_many.each_value do |has_many|
+          row.add_nested_row(key: has_many.name, row: has_many.build_row)
+        end
+
+        row
       end
-    end
-
-    def resolve_path(key)
-      nested_field ? "#{nested_field}.#{key}".to_sym : key
-    end
-
-    private
-
-    def t(key)
-      translated = ::MagicReport::Utils.t(name: name, key: key)
-
-      prefix ? "#{prefix} #{translated}" : translated
     end
   end
 end

@@ -3,61 +3,50 @@
 module MagicReport
   class Report
     class Row
-      attr_accessor :data, :inner_rows, :nested_rows
+      class Column
+        attr_reader :key, :heading, :prefix, :value
+
+        def initialize(key, heading, prefix)
+          @key = key
+          @heading = heading
+          @prefix = prefix
+          @value = nil
+        end
+
+        def assign_value(value)
+          @value = value
+        end
+
+        def full_heading
+          prefix ? "#{prefix} #{heading}" : heading
+        end
+      end
+
+      attr_reader :columns, :nested_rows
 
       def initialize
-        @data = {}
-        @inner_rows = {}
+        @columns = []
         @nested_rows = {}
       end
 
-      def add(field:, value:)
-        data[field] = value
+      def add_column_value(key:, value:)
+        @columns.find { |column| column.key == key }.assign_value(value)
       end
 
-      def add_inner_row(field:, row:)
-        inner_rows[field] = row
+      def add_nested_row(key:, row:)
+        nested_rows[key] = row
       end
 
-      def add_nested_row(field:, row:)
-        nested_rows[field] ||= []
-        nested_rows[field].push(row)
+      def register_column(key, heading, prefix = nil)
+        @columns << Column.new(key, heading, prefix)
       end
 
-      def values
-        data.values
+      def headings
+        (columns.map(&:full_heading) + nested_rows.values.map(&:headings)).flatten
       end
 
-      def complex?
-        nested_rows.any?
-      end
-
-      def each_nested_row(&block)
-        nested_rows.keys.flat_map do |key|
-          nested_rows[key].map do |nested_row|
-            block.call(nested_row)
-          end
-        end
-      end
-
-      def each_inner_row(&block)
-        inner_rows.values.map do |inner_row|
-          block.call(inner_row)
-        end
-      end
-
-      def to_h
-        @to_h ||= begin
-          original_hash = inner_rows.any? ? data.merge(each_inner_row { |inner_row| inner_row.to_h }.reduce({}, :merge)) : data
-
-          if complex?
-            each_nested_row do |nested_row|
-              original_hash.merge(nested_row.to_h)
-            end
-          else
-            original_hash
-          end
-        end
+      def to_a
+        (columns.map(&:value) + nested_rows.values.map(&:to_a)).flatten
       end
     end
   end

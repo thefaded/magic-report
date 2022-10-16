@@ -7,7 +7,15 @@ en:
       id: ID
       name: Name
       full_name: Full name
-      car: Car
+      cars:
+        name: Name
+        price: Price
+      shipping_address:
+        address_line_1: Address line 1
+        city: City
+      address_relation: My home address
+      shipping_address_relation: My ship
+      cars_relation: Car
     address:
       address_line_1: Address line 1
       city: City
