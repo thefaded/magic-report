@@ -18,7 +18,7 @@ module MagicReport
         end
 
         def full_heading
-          prefix ? "#{prefix} #{heading}" : heading
+          prefix.present? ? "#{prefix} #{heading}" : heading
         end
       end
 
