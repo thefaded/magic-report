@@ -32,15 +32,17 @@ module MagicReport
 
           resik = has_many.process_rows(model, simple_row)
 
-          resik.shift.map do |resik_row|
-            new_row = self.class.build_row
+          resik.map.with_index do |resik_row, index|
+            if index.zero?
+              # rows.push(new_row)
+            else
+              new_row = self.class.build_row
+              # TODO: copy ID here
+              # copy_primary_attributes(new_row, row)
+              new_row.nested_rows[has_many.name] = resik_row
 
-            # TODO: copy ID here
-            # copy_primary_attributes(new_row, row)
-
-            new_row.nested_rows[has_many.name] = resik_row
-
-            rows.push(new_row)
+              rows.push(new_row)
+            end
           end
         end
 

@@ -79,7 +79,7 @@ RSpec.describe MagicReport::Report do
       expect(report.rows.count).to eq(2)
       expect(report.rows.map(&:to_a)).to eq([
         [5, "Dan", "DanMagic", "Ave street", "NY", "Clucky street", "SF", "BMW", 5000],
-        [nil, nil, nil, nil, nil, nil, nil, "BMW", 5000]
+        [nil, nil, nil, nil, nil, nil, nil, "Lexus", 6000]
       ])
       expect(report.headings).to eq([
         "ID",
@@ -92,6 +92,19 @@ RSpec.describe MagicReport::Report do
         "Car Name",
         "Car Price"
       ])
+    end
+
+    context "when single entry provided for `has_many` relation" do
+      it "returns correctly" do
+        user.cars = [user.cars.first]
+
+        report = subject.new(user)
+
+        expect(report.rows.count).to eq(1)
+        expect(report.rows.map(&:to_a)).to eq([
+          [5, "Dan", "DanMagic", "Ave street", "NY", "Clucky street", "SF", "BMW", 5000]
+        ])
+      end
     end
   end
 end
