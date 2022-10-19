@@ -54,6 +54,20 @@ module MagicReport
       row.headings
     end
 
+    def as_attachment
+      @csv ||= begin
+        csv = Csv.new(self)
+        csv.generate
+
+        csv
+      end
+
+      @as_attachment ||= {
+        mime_type: "text/csv",
+        content: csv.io.read
+      }
+    end
+
     class << self
       # Default i18n scope for locales
       #

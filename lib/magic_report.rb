@@ -24,5 +24,6 @@ module MagicReport
 
   require "magic_report/report/reflection"
   require "magic_report/report/row"
+  require "magic_report/report/csv"
   require "magic_report/report"
 end

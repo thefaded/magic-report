@@ -106,5 +106,13 @@ RSpec.describe MagicReport::Report do
         ])
       end
     end
+
+    context "CSV" do
+      it "correctly represents report as CSV" do
+        report = subject.new(user)
+
+        expect(report.as_attachment[:content]).to eq("ID,Name,Full name,My home address Address line 1,My home address City,My ship Address line 1,My ship City,Car Name,Car Price\n5,Dan,DanMagic,Ave street,NY,Clucky street,SF,BMW,5000\n,,,,,,,Lexus,6000\n")
+      end
+    end
   end
 end
