@@ -4,16 +4,17 @@ module MagicReport
   class Report
     class Builder
       class Field
-        def self.build(report, name, processor)
-          new(report, name, processor)
+        def self.build(report, name, processor, options)
+          new(report, name, processor, options)
         end
 
-        attr_reader :report, :name, :processor
+        attr_reader :report, :name, :processor, :is_primary
 
-        def initialize(report, name, processor)
+        def initialize(report, name, processor, options)
           @report = report
           @name = name
           @processor = processor
+          @is_primary = options.fetch(:primary, false)
         end
 
         def process(model)

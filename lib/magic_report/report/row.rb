@@ -4,11 +4,12 @@ module MagicReport
   class Report
     class Row
       class Column
-        attr_reader :key, :heading, :prefix, :value
+        attr_reader :key, :heading, :is_primary, :prefix, :value
 
-        def initialize(key, heading, prefix)
+        def initialize(key, heading, is_primary, prefix)
           @key = key
           @heading = heading
+          @is_primary = is_primary
           @prefix = prefix
           @value = nil
         end
@@ -37,8 +38,8 @@ module MagicReport
         nested_rows[key] = row
       end
 
-      def register_column(key, heading, prefix = nil)
-        @columns << Column.new(key, heading, prefix)
+      def register_column(key, heading, is_primary, prefix = nil)
+        @columns << Column.new(key, heading, is_primary, prefix)
       end
 
       def headings

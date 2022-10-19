@@ -21,7 +21,7 @@ RSpec.describe MagicReport::Report do
     let(:report) do
       Class.new(MagicReport::Report) do
         fields :id
-        field :name, :format_name
+        field :name, :format_name, primary: true
         field :full_name, proc { |user| user.name + user.surname }
 
         def format_name(record, name)
@@ -42,6 +42,7 @@ RSpec.describe MagicReport::Report do
 
       expect(row.to_a).to eq([5, "Hello Dan", "DanMagic"])
       expect(row.headings).to eq(["ID", "Name", "Full name"])
+      expect(row.columns[1].is_primary).to be_truthy
     end
   end
 
@@ -57,7 +58,8 @@ RSpec.describe MagicReport::Report do
           field :city
         end
 
-        fields :id, :name
+        field :id, primary: true
+        fields :name
         field :full_name, proc { |user| user.name + user.surname }
 
         has_one :address, class: Address
@@ -79,7 +81,7 @@ RSpec.describe MagicReport::Report do
       expect(report.rows.count).to eq(2)
       expect(report.rows.map(&:to_a)).to eq([
         [5, "Dan", "DanMagic", "Ave street", "NY", "Clucky street", "SF", "BMW", 5000],
-        [nil, nil, nil, nil, nil, nil, nil, "Lexus", 6000]
+        [5, nil, nil, nil, nil, nil, nil, "Lexus", 6000]
       ])
       expect(report.headings).to eq([
         "ID",
@@ -109,9 +111,9 @@ RSpec.describe MagicReport::Report do
 
     context "CSV" do
       it "correctly represents report as CSV" do
-        report = subject.new(user)
+        report = ::MagicReport::GeneralReport.new(user, subject)
 
-        expect(report.as_attachment[:content]).to eq("ID,Name,Full name,My home address Address line 1,My home address City,My ship Address line 1,My ship City,Car Name,Car Price\n5,Dan,DanMagic,Ave street,NY,Clucky street,SF,BMW,5000\n,,,,,,,Lexus,6000\n")
+        expect(report.as_attachment[:content]).to eq("ID,Name,Full name,My home address Address line 1,My home address City,My ship Address line 1,My ship City,Car Name,Car Price\n5,Dan,DanMagic,Ave street,NY,Clucky street,SF,BMW,5000\n5,,,,,,,Lexus,6000\n")
       end
     end
   end

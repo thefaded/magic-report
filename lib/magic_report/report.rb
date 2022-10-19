@@ -37,6 +37,8 @@ module MagicReport
               # rows.push(new_row)
             else
               new_row = self.class.build_row
+
+              copy_primary_fields(row, new_row)
               # TODO: copy ID here
               # copy_primary_attributes(new_row, row)
               new_row.nested_rows[has_many.name] = resik_row
@@ -54,18 +56,12 @@ module MagicReport
       row.headings
     end
 
-    def as_attachment
-      @csv ||= begin
-        csv = Csv.new(self)
-        csv.generate
-
-        csv
+    def copy_primary_fields(old_row, new_row)
+      old_row.columns.each do |column|
+        if column.is_primary
+          new_row.add_column_value(key: column.key, value: column.value)
+        end
       end
-
-      @as_attachment ||= {
-        mime_type: "text/csv",
-        content: csv.io.read
-      }
     end
 
     class << self
@@ -82,8 +78,11 @@ module MagicReport
         name.underscore.tr("/", ".").to_sym
       end
 
-      def field(name, processor = nil)
-        reflection = Builder::Field.build(self, name, processor)
+      def field(*args)
+        options = args.extract_options!
+        name, processor = args
+
+        reflection = Builder::Field.build(self, name, processor, options)
 
         Reflection.add_field(self, name, reflection)
       end
@@ -110,7 +109,7 @@ module MagicReport
         row = ::MagicReport::Report::Row.new
 
         _fields.each_value do |field|
-          row.register_column(field.name, I18n.t!("#{i18n_scope}.#{i18n_key}.#{field.name}".tr("/", ".")), prefix)
+          row.register_column(field.name, I18n.t!("#{i18n_scope}.#{i18n_key}.#{field.name}".tr("/", ".")), field.is_primary, prefix)
         end
 
         _has_one.each_value do |has_one|
