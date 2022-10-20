@@ -10,19 +10,6 @@ module MagicReport
       @csv = ::MagicReport::Report::Csv.new(self)
     end
 
-    def as_attachment
-      @as_attachment ||= begin
-        generate
-
-        {
-          mime_type: "text/csv",
-          content: csv.io.read
-        }
-      end
-    end
-
-    private
-
     def generate
       models.each.with_index do |model, index|
         report = report_klass.new(model)
@@ -30,6 +17,13 @@ module MagicReport
         csv.add_headings(report) if index.zero?
         report.rows.each { |row| csv.add_row(row) }
       end
+    end
+
+    def as_attachment
+      @as_attachment ||= {
+        mime_type: "text/csv",
+        content: csv.io.read
+      }
     end
   end
 end
