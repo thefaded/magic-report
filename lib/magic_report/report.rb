@@ -4,11 +4,12 @@ module MagicReport
   class Report
     include Reflection
 
-    attr_reader :model, :row
+    attr_reader :model, :row, :is_fill
 
-    def initialize(model, row = nil)
+    def initialize(model, is_fill = false, row = nil)
       @model = model
       @row = row || self.class.build_row
+      @is_fill = is_fill
     end
 
     def rows
@@ -22,7 +23,7 @@ module MagicReport
         _has_one.each_value do |has_one|
           simple_row = row.nested_rows[has_one.name]
 
-          has_one.process_rows(model, simple_row)
+          has_one.process_rows(model, simple_row, is_fill)
         end
 
         rows.push(row)
@@ -30,7 +31,7 @@ module MagicReport
         _has_many.each_value do |has_many|
           simple_row = row.nested_rows[has_many.name]
 
-          resik = has_many.process_rows(model, simple_row)
+          resik = has_many.process_rows(model, simple_row, is_fill)
 
           resik.map.with_index do |resik_row, index|
             if index.zero?
@@ -58,8 +59,16 @@ module MagicReport
 
     def copy_primary_fields(old_row, new_row)
       old_row.columns.each do |column|
-        if column.is_primary
+        if column.is_primary || is_fill
           new_row.add_column_value(key: column.key, value: column.value)
+        end
+      end
+
+      if is_fill
+        old_row.nested_rows.each do |key, nested_row|
+          nested_row.columns.each do |column|
+            new_row.nested_rows[key].add_column_value(key: column.key, value: column.value)
+          end
         end
       end
     end

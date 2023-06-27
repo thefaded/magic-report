@@ -30,14 +30,14 @@ module MagicReport
           relation = extract_relation(model)
 
           # Refactor here values method call
-          options[:class].new(relation).values
+          options[:class].new(relation, is_fill).values
         end
 
-        def process_rows(model, row)
+        def process_rows(model, row, is_fill)
           relation = extract_relation(model)
 
           # Refactor here values method call
-          options[:class].new(relation, row).rows
+          options[:class].new(relation, is_fill, row).rows
         end
 
         def build_row

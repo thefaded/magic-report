@@ -96,6 +96,16 @@ RSpec.describe MagicReport::Report do
       ])
     end
 
+    it "works correctly with fill option" do
+      report = subject.new(user, true)
+
+      expect(report.rows.count).to eq(2)
+      expect(report.rows.map(&:to_a)).to eq([
+        [5, "Dan", "DanMagic", "Ave street", "NY", "Clucky street", "SF", "BMW", 5000],
+        [5, "Dan", "DanMagic", "Ave street", "NY", "Clucky street", "SF", "Lexus", 6000]
+      ])
+    end
+
     context "when single entry provided for `has_many` relation" do
       it "returns correctly" do
         user.cars = [user.cars.first]
