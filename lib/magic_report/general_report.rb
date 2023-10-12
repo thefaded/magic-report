@@ -12,7 +12,7 @@ module MagicReport
     end
 
     def generate
-      models.each.with_index do |model, index|
+      models.find_each.with_index do |model, index|
         report = report_klass.new(model, fill)
 
         csv.add_headings(report) if index.zero?

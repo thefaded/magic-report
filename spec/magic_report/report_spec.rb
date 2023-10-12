@@ -121,6 +121,10 @@ RSpec.describe MagicReport::Report do
 
     context "CSV" do
       it "correctly represents report as CSV" do
+        class Array
+          alias_method :find_each, :each
+        end
+
         report = ::MagicReport::GeneralReport.new(user, subject)
         report.generate
 
